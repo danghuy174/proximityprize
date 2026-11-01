@@ -100,6 +100,10 @@ def check_claude_symlink() -> list[str]:
         errors.append("Missing CLAUDE.md")
         return errors
     if not CLAUDE_PATH.is_symlink():
+        # When git clones on Windows without core.symlinks enabled, symlinks
+        # are materialized as text files containing the relative target path.
+        if CLAUDE_PATH.is_file() and CLAUDE_PATH.read_text(encoding="utf-8").strip() == "AGENTS.md":
+            return errors
         errors.append("CLAUDE.md must be a symlink to AGENTS.md")
         return errors
 

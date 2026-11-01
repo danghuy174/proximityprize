@@ -97,6 +97,22 @@ class DocumentationBoundaryTests(unittest.TestCase):
             self.assertEqual(self.checker.check_markdown_links(),
                              ["Broken link in example.md: missing.md"])
 
+    def test_claude_symlink_checks(self):
+        # Missing AGENTS.md
+        self.assertEqual(self.checker.check_claude_symlink(), ["Missing AGENTS.md"])
+
+        self.checker.AGENTS_PATH.write_text("# Agents\n", encoding="utf-8")
+        # Missing CLAUDE.md
+        self.assertEqual(self.checker.check_claude_symlink(), ["Missing CLAUDE.md"])
+
+        # Checked out as text pointer to AGENTS.md (e.g. Windows without core.symlinks)
+        self.checker.CLAUDE_PATH.write_text("AGENTS.md\n", encoding="utf-8")
+        self.assertEqual(self.checker.check_claude_symlink(), [])
+
+        # Non-matching pointer
+        self.checker.CLAUDE_PATH.write_text("OTHER.md\n", encoding="utf-8")
+        self.assertEqual(self.checker.check_claude_symlink(), ["CLAUDE.md must be a symlink to AGENTS.md"])
+
 
 if __name__ == "__main__":
     unittest.main()
