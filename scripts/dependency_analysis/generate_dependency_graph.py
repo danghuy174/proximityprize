@@ -47,7 +47,15 @@ def parse_imports(file_path: str) -> List[str]:
 
 def normalize_module_name(file_path: str, root_dir: str) -> str:
     """Convert file path to normalized module name."""
-    rel_path = Path(file_path).resolve().relative_to(Path(root_dir).resolve()).as_posix()
+    norm_file = Path(str(file_path).replace('\\', '/'))
+    norm_root = Path(str(root_dir).replace('\\', '/'))
+    try:
+        rel_path = norm_file.resolve().relative_to(norm_root.resolve()).as_posix()
+    except ValueError:
+        rel_path = norm_file.as_posix()
+        root_posix = norm_root.as_posix()
+        if rel_path.startswith(root_posix):
+            rel_path = rel_path[len(root_posix):].lstrip('/')
     if rel_path.endswith('.lean'):
         rel_path = rel_path[:-5]
     return rel_path.replace('/', '.')

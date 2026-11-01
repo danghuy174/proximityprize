@@ -17,15 +17,14 @@ import generate_top_level_graph as gtlg
 class DependencyAnalysisTests(unittest.TestCase):
     def test_normalize_module_name_cross_platform(self):
         root = SCRIPTS_DIR.parent
-        # Relative forward slash
-        rel_forward = "ArkLib/Data/Basic.lean"
+        # Native and forward slash
         full_forward = str(root / "ArkLib" / "Data" / "Basic.lean")
         self.assertEqual(
             gdg.normalize_module_name(full_forward, str(root)),
             "ArkLib.Data.Basic",
         )
-        # Windows-style backslashes
-        full_backward = str(root) + "\\ArkLib\\Data\\Basic.lean"
+        # Windows-style backslashes or mixed separators
+        full_backward = str(root).replace("/", "\\") + "\\ArkLib\\Data\\Basic.lean"
         self.assertEqual(
             gdg.normalize_module_name(full_backward, str(root)),
             "ArkLib.Data.Basic",
